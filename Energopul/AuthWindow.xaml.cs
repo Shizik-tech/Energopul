@@ -14,16 +14,16 @@ using MySql.EntityFrameworkCore;
 
 namespace Energopul
 {
-    public partial class Window1 : Window
+    public partial class AuthWindow : Window
     {
-        public Window1()
+        public AuthWindow()
         {
             InitializeComponent();
         }
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void AuthBtn_Click(object sender, RoutedEventArgs e)
         {
-            string username = txtUsername.Text;
-            string password = txtPassword.Password;
+            string username = TxtUsername.Text;
+            string password = TxtPassword.Password;
 
             if (username == "test1" && password == "test1")
             {
