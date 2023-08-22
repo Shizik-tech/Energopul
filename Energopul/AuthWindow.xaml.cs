@@ -25,7 +25,7 @@ namespace Energopul
             string username = TxtUsername.Text;
             string password = TxtPassword.Password;
 
-            if (username == "test1" && password == "test1")
+            if (username == "" && password == "")
             {
                 MainWindow mainWindow = new MainWindow();
                 mainWindow.Show();

@@ -14,7 +14,7 @@
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
         <Label Content="Авторизация" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0"/>
-        <TextBox Grid.Row="1" x:Name="TxtUsername" HorizontalAlignment="Stretch" Margin="40, 10" Text="Логин" Height="35" TextWrapping="Wrap" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="1" x:Name="TxtUsername" HorizontalAlignment="Stretch" Margin="40, 10" Height="35" TextWrapping="Wrap" VerticalAlignment="Center"/>
         <PasswordBox Grid.Row="2" x:Name="TxtPassword" HorizontalAlignment="Stretch" Margin="40, 10" Height="35" VerticalAlignment="Center"/>
         <Button MaxHeight="70" MaxWidth="150" Name="AuthBtn" Grid.Row="3" Content="Вход" HorizontalAlignment="Stretch" Margin="40, 10" Click="AuthBtn_Click"/>
 
