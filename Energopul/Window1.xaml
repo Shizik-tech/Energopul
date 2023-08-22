@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Energopul"
         mc:Ignorable="d"
-        Title="Window1" Height="450" Width="800">
+        Title="Window1" Height="350" Width="300">
     <Grid>
         <Label Content="Авторизация" HorizontalAlignment="Center" Margin="0,68,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="txtUsername" HorizontalAlignment="Center" Margin="0,161,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
