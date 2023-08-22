@@ -5,16 +5,38 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Energopul"
         mc:Ignorable="d"
-        Title="Contracts" Height="450" Width="800">
+        Title="Contracts" Height="450" Width="800" MinHeight="450" MinWidth="800">
     <Grid>
-        <Label Content="Label" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-        <DataGrid Margin="0,93,0,0"/>
-        <TextBox HorizontalAlignment="Center" Margin="0,27,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <ComboBox HorizontalAlignment="Left" Margin="140,21,0,0" VerticalAlignment="Top" Width="120"/>
-        <Button Content="Поиск" HorizontalAlignment="Center" Margin="0,59,0,0" VerticalAlignment="Top"/>
-        <Button Content="Экспорт в Excel" HorizontalAlignment="Left" Margin="581,26,0,0" VerticalAlignment="Top"/>
-        <Button Content="Экспорт в Word" HorizontalAlignment="Left" Margin="681,26,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.609,-0.043"/>
-        <Button Content="Внести изменения" HorizontalAlignment="Left" Margin="621,59,0,0" VerticalAlignment="Top"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"></RowDefinition>
+            <RowDefinition Height="4*"></RowDefinition>
+            <RowDefinition Height="4*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <DataGrid Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="4" Margin="10"/>
+        <Grid Grid.Row="0" Grid.Column="1" VerticalAlignment="Stretch" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <TextBox HorizontalAlignment="Stretch" Margin="0,0,0,5" TextAlignment="Center" VerticalContentAlignment="Center" Text="Документ" VerticalAlignment="Stretch"/>
+            <ComboBox Grid.Row="1" Margin="0,5,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+        </Grid>
+        <Button Grid.Row="0" Grid.Column="2" Content="Поиск" Margin="10"/>
+        <Grid Grid.Row="0" Grid.Column="3" VerticalAlignment="Stretch" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <Button Content="Экспорт в Excel" Margin="0,0,0,5" VerticalAlignment="Stretch"/>
+            <Button Grid.Row="1" Content="Экспорт в Word" Margin="0,5,0,0" VerticalAlignment="Stretch"/>
+        </Grid>
+        <Button Grid.Row="0" Grid.Column="0" Content="Внести изменения" Margin="10"/>
 
     </Grid>
 </Window>
