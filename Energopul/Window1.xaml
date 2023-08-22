@@ -8,9 +8,10 @@
         Title="Window1" Height="450" Width="800">
     <Grid>
         <Label Content="Авторизация" HorizontalAlignment="Center" Margin="0,68,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Center" Margin="0,161,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <TextBox HorizontalAlignment="Center" Margin="0,217,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <Button Content="Вход" HorizontalAlignment="Center" Margin="0,283,0,0" VerticalAlignment="Top" Height="28" Width="100"/>
+        <TextBox x:Name="txtUsername" HorizontalAlignment="Center" Margin="0,161,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+
+        <Button Content="Вход" HorizontalAlignment="Center" Margin="0,283,0,0" VerticalAlignment="Top" Height="28" Width="100" Click="Button_Click"/>
+        <PasswordBox x:Name="txtPassword" HorizontalAlignment="Center" Margin="0,224,0,0" VerticalAlignment="Top" Width="120"/>
 
     </Grid>
 </Window>
