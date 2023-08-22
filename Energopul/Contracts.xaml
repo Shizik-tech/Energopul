@@ -1,0 +1,20 @@
+﻿<Window x:Class="Energopul.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Energopul"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Label Content="Договора" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <DataGrid Margin="0,93,0,0"/>
+        <TextBox HorizontalAlignment="Center" Margin="0,27,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <ComboBox HorizontalAlignment="Left" Margin="140,21,0,0" VerticalAlignment="Top" Width="120"/>
+        <Button Content="Поиск" HorizontalAlignment="Center" Margin="0,59,0,0" VerticalAlignment="Top"/>
+        <Button Content="Экспорт в Excel" HorizontalAlignment="Left" Margin="581,26,0,0" VerticalAlignment="Top"/>
+        <Button Content="Экспорт в Word" HorizontalAlignment="Left" Margin="681,26,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.609,-0.043"/>
+        <Button Content="Внести изменения" HorizontalAlignment="Left" Margin="621,59,0,0" VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>
