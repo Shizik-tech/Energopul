@@ -22,6 +22,11 @@ using System.Data.SQLite;
 using System;
 using System.Data;
 using Path = System.IO.Path;
+using OfficeOpenXml;
+using System;
+using System.Data;
+using System.Data.SQLite;
+using System.IO;
 
 namespace Energopul
 {
@@ -35,7 +40,6 @@ namespace Energopul
 
         private void LoadDataToDataGrid()
         {
-            
             string relativePath = "energopul.db";
             string fullPath = Path.Combine(AppContext.BaseDirectory, relativePath);
             string connectionString = $"Data Source={fullPath};Version=3;";
@@ -49,10 +53,48 @@ namespace Energopul
             adapter.Fill(dataTable);
             Table.ItemsSource = dataTable.DefaultView;
         }
-
+        
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            string relativePath = "energopul.db";
+            string fullPath = Path.Combine(AppContext.BaseDirectory, relativePath);
+            string connectionString = $"Data Source={fullPath};Version=3;";
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+            {
+                string query = "SELECT * FROM Contracts";
+                using (SQLiteDataAdapter adapter = new SQLiteDataAdapter(query, connection))
+                {
+                    DataTable dataTable = new DataTable();
+                    adapter.Fill(dataTable);
+                    
+                    ExportDataTableToExcel(dataTable, "Contracts.xlsx");
+                }
+            }
+        }
+        static void ExportDataTableToExcel(DataTable dataTable, string fileName)
+        {
+            using (ExcelPackage package = new ExcelPackage(new FileInfo(fileName)))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Sheet1");
+
+                // Запись заголовков
+                for (int col = 0; col < dataTable.Columns.Count; col++)
+                {
+                    worksheet.Cells[1, col + 1].Value = dataTable.Columns[col].ColumnName;
+                }
+
+                // Запись данных
+                for (int row = 0; row < dataTable.Rows.Count; row++)
+                {
+                    for (int col = 0; col < dataTable.Columns.Count; col++)
+                    {
+                        worksheet.Cells[row + 2, col + 1].Value = dataTable.Rows[row][col];
+                    }
+                }
+
+                package.Save();
+            }
         }
     }
 }
