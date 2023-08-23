@@ -4,6 +4,9 @@ using System.Data.SQLite;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
 using OfficeOpenXml;
 using Word = Microsoft.Office.Interop.Word;
 
@@ -44,8 +47,12 @@ namespace Energopul
             Table.ItemsSource = dataTable.DefaultView;
         }
 
+
+
         private void ExportDataTableToExcel(DataTable dataTable, string fileName)
         {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
             using (ExcelPackage package = new ExcelPackage(new FileInfo(fileName)))
             {
                 ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Sheet1");
@@ -66,36 +73,51 @@ namespace Energopul
                 package.Save();
             }
         }
-        
+
         private void ExportDataTableToWord(DataTable dataTable, string fileName)
         {
-            Word.Application wordApp = new Word.Application();
-            Word.Document doc = wordApp.Documents.Add();
-            
-            Word.Paragraph para = doc.Paragraphs.Add();
-            Word.Table table = doc.Tables.Add(para.Range, dataTable.Rows.Count + 1, dataTable.Columns.Count);
+            using (WordprocessingDocument doc = WordprocessingDocument.Create(fileName, WordprocessingDocumentType.Document))
+            {
+                MainDocumentPart mainPart = doc.AddMainDocumentPart();
+                mainPart.Document = new Document();
+                Body body = mainPart.Document.AppendChild(new Body());
 
-            for (int col = 0; col < dataTable.Columns.Count; col++)
-            {
-                table.Cell(1, col + 1).Range.Text = dataTable.Columns[col].ColumnName;
-            }
-            
-            for (int row = 0; row < dataTable.Rows.Count; row++)
-            {
-                for (int col = 0; col < dataTable.Columns.Count; col++)
+
+                Table table = new Table();
+
+
+                TableProperties tblProperties = new TableProperties(
+                    new TableWidth() { Type = TableWidthUnitValues.Pct, Width = "100%" });
+
+                table.AppendChild(tblProperties);
+
+
+                TableRow headerRow = new TableRow();
+
+                foreach (DataColumn column in dataTable.Columns)
                 {
-                    table.Cell(row + 2, col + 1).Range.Text = dataTable.Rows[row][col].ToString();
+                    TableCell headerCell = new TableCell(new Paragraph(new Run(new Text(column.ColumnName))));
+                    headerRow.Append(headerCell);
                 }
+
+                table.Append(headerRow);
+
+
+                foreach (DataRow dataRow in dataTable.Rows)
+                {
+                    TableRow dataTableRow = new TableRow();
+
+                    foreach (var item in dataRow.ItemArray)
+                    {
+                        TableCell dataCell = new TableCell(new Paragraph(new Run(new Text(item.ToString()))));
+                        dataTableRow.Append(dataCell);
+                    }
+
+                    table.Append(dataTableRow);
+                }
+
+                body.Append(table);
             }
-
-            doc.SaveAs2(fileName);
-            doc.Close();
-            wordApp.Quit();
-
-            Marshal.ReleaseComObject(table);
-            Marshal.ReleaseComObject(para);
-            Marshal.ReleaseComObject(doc);
-            Marshal.ReleaseComObject(wordApp);
         }
 
         private void ExportDataButton_Click(object sender, RoutedEventArgs e)
@@ -110,5 +132,71 @@ namespace Energopul
             DataTable dataTable = GetDataFromSqLite(query);
             ExportDataTableToWord(dataTable, "Contracts.docx");
         }
+
+        private void ButtonShow_Click(object sender, EventArgs e)
+        {
+            int periodIndex = Period.SelectedIndex + 1; // Индексы ComboBox начинаются с 0
+            var conn = new SQLiteConnection(GetConnectionString());
+            using (SQLiteCommand cmd = conn.CreateCommand())
+            {
+                string end_date_rout = DateTime.Now.ToString("yyyy-MM-dd");
+
+                string start_date = "";
+                switch (periodIndex)
+                {
+                    case 1:
+                        start_date = DateTime.Now.AddMonths(-3).ToString("yyyy-MM-dd");
+                        break;
+                    case 2:
+                        start_date = DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd");
+                        break;
+                    case 3:
+                        start_date = DateTime.Now.AddYears(-1).ToString("yyyy-MM-dd");
+                        break;
+                    case 4:
+                        start_date = DateTime.Now.AddYears(-2).ToString("yyyy-MM-dd");
+                        break;
+                    default:
+                        MessageBox.Show("Invalid period");
+                        return;
+                }
+
+                cmd.CommandText = $@"
+                    SELECT
+                        org.org_name AS 'Название организации',
+                        org.INN_org AS 'ИНН организации',
+                        con.сon_num AS 'Номер договора',
+                        con.date_of_con AS 'Дата заключения договора',
+                        con.end_date AS 'Дата окончания договора',
+                        con.sub_of_contr AS 'Предмет договора',
+                        con.con_sum AS 'Сумма договора',
+                        con.deadlin_stages AS 'Сроки по этапам договора'
+                    FROM
+                        Contracts con
+                        JOIN Organizations org ON con.org_id = org.id
+                    WHERE
+                        con.date_of_con BETWEEN @start_date AND @end_date_rout";
+
+                cmd.Parameters.AddWithValue("@start_date", start_date);
+                cmd.Parameters.AddWithValue("@end_date_rout", end_date_rout);
+
+                DataTable dataTable = new DataTable();
+                using (SQLiteDataAdapter adapter = new SQLiteDataAdapter(cmd))
+                {
+                    adapter.Fill(dataTable);
+                }
+
+                // Привязка данных к WPF DataGrid (Table)
+                Table.ItemsSource = dataTable.DefaultView;
+            }
+        }
+
+
+
+        private void ComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }
+
