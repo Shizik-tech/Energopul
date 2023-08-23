@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using OfficeOpenXml;
@@ -46,26 +47,39 @@ namespace Energopul
 
         private void ExportDataTableToExcel(DataTable dataTable, string fileName)
         {
-            using (ExcelPackage package = new ExcelPackage(new FileInfo(fileName)))
-            {
-                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Sheet1");
+            FileInfo fileInfo = new FileInfo(fileName);
 
-                for (int col = 0; col < dataTable.Columns.Count; col++)
+            using (ExcelPackage package = new ExcelPackage(fileInfo))
+            {
+                ExcelWorksheet worksheet = null;
+
+                if (package.Workbook.Worksheets.Any(sheet => sheet.Name == "Таблица1"))
                 {
-                    worksheet.Cells[1, col + 1].Value = dataTable.Columns[col].ColumnName;
+                    worksheet = package.Workbook.Worksheets["Таблица1"];
                 }
+                else
+                {
+                    worksheet = package.Workbook.Worksheets.Add("Таблица1");
+                    for (int col = 0; col < dataTable.Columns.Count; col++)
+                    {
+                        worksheet.Cells[1, col + 1].Value = dataTable.Columns[col].ColumnName;
+                    }
+                }
+
+                int lastUsedRow = worksheet.Dimension?.End.Row ?? 1;
 
                 for (int row = 0; row < dataTable.Rows.Count; row++)
                 {
                     for (int col = 0; col < dataTable.Columns.Count; col++)
                     {
-                        worksheet.Cells[row + 2, col + 1].Value = dataTable.Rows[row][col];
+                        worksheet.Cells[lastUsedRow + row + 1, col + 1].Value = dataTable.Rows[row][col];
                     }
                 }
 
                 package.Save();
             }
         }
+
         
         private void ExportDataTableToWord(DataTable dataTable, string fileName)
         {
@@ -103,6 +117,7 @@ namespace Energopul
             string query = "SELECT * FROM Contracts";
             DataTable dataTable = GetDataFromSqLite(query);
             ExportDataTableToExcel(dataTable, "Contracts.xlsx");
+            MessageBox.Show("Экспорт данных успешно выполнен", "Экспорт", MessageBoxButton.OK);
         }
         private void ExportDataToWordButton_Click(object sender, RoutedEventArgs e)
         {
