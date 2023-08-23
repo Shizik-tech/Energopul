@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System;
+using System.IO;
 using System.Data;
 using System.Data.Common;
 using System.Windows;
@@ -20,6 +21,7 @@ using System.Windows.Controls;
 using System.Data.SQLite;
 using System;
 using System.Data;
+using Path = System.IO.Path;
 
 namespace Energopul
 {
@@ -30,20 +32,21 @@ namespace Energopul
             InitializeComponent();
             LoadDataToDataGrid();
         }
+
         private void LoadDataToDataGrid()
         {
-            const string connectionString = "Data Source=EnergiserDB.db;Version=3;";
-            if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
-
+            
+            string relativePath = "energopul.db";
+            string fullPath = Path.Combine(AppContext.BaseDirectory, relativePath);
+            string connectionString = $"Data Source={fullPath};Version=3;";
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
-
-            const string query = "SELECT * FROM Contracts";
-
-            using var adapter = new SQLiteDataAdapter(query, connection);
+        
+            const string query = "SELECT * FROM Contracts;";
+            using var command = new SQLiteCommand(query, connection);
+            using var adapter = new SQLiteDataAdapter(command);
             var dataTable = new DataTable();
             adapter.Fill(dataTable);
-
             Table.ItemsSource = dataTable.DefaultView;
         }
 
