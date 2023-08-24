@@ -1,14 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
-using System.Runtime.InteropServices;
+using System.Linq;
 using System.Windows;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using OfficeOpenXml;
 using Word = Microsoft.Office.Interop.Word;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
+using NPOI.HSSF.UserModel;
+using NPOI.XWPF.UserModel;
 
 namespace Energopul
 {
@@ -55,23 +60,50 @@ namespace Energopul
 
             using (ExcelPackage package = new ExcelPackage(new FileInfo(fileName)))
             {
-                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Sheet1");
+                MessageBoxResult result = MessageBox.Show("Документ с таким названием уже существует. Перезаписать?", "Предупреждение", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
-                for (int col = 0; col < dataTable.Columns.Count; col++)
+                if (result == MessageBoxResult.No)
                 {
-                    worksheet.Cells[1, col + 1].Value = dataTable.Columns[col].ColumnName;
+                    MessageBox.Show("Операция отменена.");
+                    return;
                 }
+                else
+                {
+                    fileInfo.Delete();
+                }
+            }
+
+            using (ExcelPackage package = new ExcelPackage(fileInfo))
+            {
+                ExcelWorksheet worksheet = null;
+
+                if (package.Workbook.Worksheets.Any(sheet => sheet.Name == "Таблица1"))
+                {
+                    worksheet = package.Workbook.Worksheets["Таблица1"];
+                }
+                else
+                {
+                    worksheet = package.Workbook.Worksheets.Add("Таблица1");
+                    for (int col = 0; col < dataTable.Columns.Count; col++)
+                    {
+                        worksheet.Cells[1, col + 1].Value = dataTable.Columns[col].ColumnName;
+                    }
+                }
+
+                int lastUsedRow = worksheet.Dimension?.End.Row ?? 1;
 
                 for (int row = 0; row < dataTable.Rows.Count; row++)
                 {
                     for (int col = 0; col < dataTable.Columns.Count; col++)
                     {
-                        worksheet.Cells[row + 2, col + 1].Value = dataTable.Rows[row][col];
+                        worksheet.Cells[lastUsedRow + row + 1, col + 1].Value = dataTable.Rows[row][col];
                     }
                 }
 
                 package.Save();
             }
+
+            MessageBox.Show("Экспорт данных успешно выполнен", "Экспорт", MessageBoxButton.OK);
         }
 
         private void ExportDataTableToWord(DataTable dataTable, string fileName)
@@ -119,13 +151,14 @@ namespace Energopul
                 body.Append(table);
             }
         }
-
+        
         private void ExportDataButton_Click(object sender, RoutedEventArgs e)
         {
             string query = "SELECT * FROM Contracts";
             DataTable dataTable = GetDataFromSqLite(query);
             ExportDataTableToExcel(dataTable, "Contracts.xlsx");
         }
+        
         private void ExportDataToWordButton_Click(object sender, RoutedEventArgs e)
         {
             string query = "SELECT * FROM Contracts";
