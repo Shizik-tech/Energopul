@@ -1,19 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
-using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using OfficeOpenXml;
 using Word = Microsoft.Office.Interop.Word;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
-using NPOI.HSSF.UserModel;
-using NPOI.XWPF.UserModel;
 
 namespace Energopul
 {
@@ -60,50 +55,23 @@ namespace Energopul
 
             using (ExcelPackage package = new ExcelPackage(new FileInfo(fileName)))
             {
-                MessageBoxResult result = MessageBox.Show("Документ с таким названием уже существует. Перезаписать?", "Предупреждение", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Sheet1");
 
-                if (result == MessageBoxResult.No)
+                for (int col = 0; col < dataTable.Columns.Count; col++)
                 {
-                    MessageBox.Show("Операция отменена.");
-                    return;
+                    worksheet.Cells[1, col + 1].Value = dataTable.Columns[col].ColumnName;
                 }
-                else
-                {
-                    fileInfo.Delete();
-                }
-            }
-
-            using (ExcelPackage package = new ExcelPackage(fileInfo))
-            {
-                ExcelWorksheet worksheet = null;
-
-                if (package.Workbook.Worksheets.Any(sheet => sheet.Name == "Таблица1"))
-                {
-                    worksheet = package.Workbook.Worksheets["Таблица1"];
-                }
-                else
-                {
-                    worksheet = package.Workbook.Worksheets.Add("Таблица1");
-                    for (int col = 0; col < dataTable.Columns.Count; col++)
-                    {
-                        worksheet.Cells[1, col + 1].Value = dataTable.Columns[col].ColumnName;
-                    }
-                }
-
-                int lastUsedRow = worksheet.Dimension?.End.Row ?? 1;
 
                 for (int row = 0; row < dataTable.Rows.Count; row++)
                 {
                     for (int col = 0; col < dataTable.Columns.Count; col++)
                     {
-                        worksheet.Cells[lastUsedRow + row + 1, col + 1].Value = dataTable.Rows[row][col];
+                        worksheet.Cells[row + 2, col + 1].Value = dataTable.Rows[row][col];
                     }
                 }
 
                 package.Save();
             }
-
-            MessageBox.Show("Экспорт данных успешно выполнен", "Экспорт", MessageBoxButton.OK);
         }
 
         private void ExportDataTableToWord(DataTable dataTable, string fileName)
@@ -151,14 +119,13 @@ namespace Energopul
                 body.Append(table);
             }
         }
-        
+
         private void ExportDataButton_Click(object sender, RoutedEventArgs e)
         {
             string query = "SELECT * FROM Contracts";
             DataTable dataTable = GetDataFromSqLite(query);
             ExportDataTableToExcel(dataTable, "Contracts.xlsx");
         }
-        
         private void ExportDataToWordButton_Click(object sender, RoutedEventArgs e)
         {
             string query = "SELECT * FROM Contracts";
@@ -196,17 +163,16 @@ namespace Energopul
 
                 cmd.CommandText = $@"
                     SELECT
-                        org.org_name AS 'Название организации',
-                        org.INN_org AS 'ИНН организации',
-                        con.сon_num AS 'Номер договора',
-                        con.date_of_con AS 'Дата заключения договора',
-                        con.end_date AS 'Дата окончания договора',
-                        con.sub_of_contr AS 'Предмет договора',
-                        con.con_sum AS 'Сумма договора',
-                        con.deadlin_stages AS 'Сроки по этапам договора'
+                        org.Name AS 'Название организации',
+                        org.INN AS 'ИНН организации',
+                        con.Con_date AS 'Номер договора',
+                        con.Start_date AS 'Дата заключения договора',
+                        con.Con_stage AS 'Этап договора',
+                        con.Sub_of_con AS 'Предмет договора',
+                        con.Con_sum AS 'Сумма договора',
+                        con.Con_end AS 'Дата окончания договора'
                     FROM
                         Contracts con
-                        JOIN Organizations org ON con.org_id = org.id
                     WHERE
                         con.date_of_con BETWEEN @start_date AND @end_date_rout";
 
@@ -224,7 +190,77 @@ namespace Energopul
             }
         }
 
+        private void SaveChangesToDatabase(DataTable dataTable)
+        {
+            using var connection = new SQLiteConnection(GetConnectionString());
+            connection.Open();
 
+            using (var transaction = connection.BeginTransaction())
+            using (var command = new SQLiteCommand(connection))
+            {
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    string commandText = "";
+                    command.Parameters.Clear();
+
+                    
+                    if (row.RowState == DataRowState.Added)
+                    {
+                        // Операция INSERT
+                        commandText = "INSERT INTO Contracts (Название, ИНН, \"Номер договора\", \"Дата заключения\", \"Дата начала выполнения\", \"Предмет договора\", \"Сумма договора\", \"Этап договора\", \"Дата окончания выполнения\") VALUES (@Название, @ИНН, @Номер_договора, @Дата_заключения, @Дата_начала_выполнения, @Предмет_договора, @Сумма_договора, @Этап_договора, @Дата_окончания_выполнения)";
+                    }
+                    else if (row.RowState == DataRowState.Modified)
+                    {
+                        // Операция UPDATE
+                        commandText = "UPDATE Contracts SET Название = @Название, ИНН = @ИНН, \"Номер договора\" = @Номер_договора, \"Дата заключения\" = @Дата_заключения, \"Дата начала выполнения\" = @Дата_начала_выполнения, \"Предмет договора\" = @Предмет_договора, \"Сумма договора\" = @Сумма_договора, \"Этап договора\" = @Этап_договора, \"Дата окончания выполнения\" = @Дата_окончания_выполнения WHERE id = @id";
+                        command.Parameters.AddWithValue("@id", row["id"]);
+                    }
+                    else if (row.RowState == DataRowState.Deleted)
+                    {
+                        // Операция DELETE
+                        DataRow originalRow = row.Table.Rows.Find(row["id", DataRowVersion.Original]);
+                        if (originalRow != null)
+                        {
+                            commandText = "DELETE FROM Contracts WHERE id = @id";
+                            command.Parameters.AddWithValue("@id", originalRow["id"]);
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(commandText))
+                    {
+                        command.CommandText = commandText;
+                        command.Parameters.AddWithValue("@Название", row["Название"]);
+                        command.Parameters.AddWithValue("@ИНН", row["ИНН"]);
+                        command.Parameters.AddWithValue("@Номер_договора", row["Номер договора"]);
+                        command.Parameters.AddWithValue("@Дата_заключения", row["Дата заключения"]);
+                        command.Parameters.AddWithValue("@Дата_начала_выполнения", row["Дата начала выполнения"]);
+                        command.Parameters.AddWithValue("@Предмет_договора", row["Предмет договора"]);
+                        command.Parameters.AddWithValue("@Сумма_договора", row["Сумма договора"]);
+                        command.Parameters.AddWithValue("@Этап_договора", row["Этап договора"]);
+                        command.Parameters.AddWithValue("@Дата_окончания_выполнения", row["Дата окончания выполнения"]);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+
+                transaction.Commit();
+            }
+        }
+
+        private void SaveChangesButton_Click(object sender, RoutedEventArgs e)
+        {
+            DataTable dataTable = (Table.ItemsSource as DataView)?.Table;
+
+            if (dataTable != null)
+            {
+                SaveChangesToDatabase(dataTable);
+                MessageBox.Show("Изменения успешно сохранены", "Сохранение изменений", MessageBoxButton.OK);
+            }
+            else
+            {
+                MessageBox.Show("Ошибка: не удалось получить данные для сохранения", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
 
         private void ComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
