@@ -214,60 +214,72 @@ namespace Energopul
             }
         }
 
+
         private void SaveChangesToDatabase(DataTable dataTable)
         {
-            using var connection = new SQLiteConnection(GetConnectionString());
-            connection.Open();
+            string connectionString = GetConnectionString();
 
-            using (var transaction = connection.BeginTransaction())
-            using (var command = new SQLiteCommand(connection))
+            using (var connection = new SQLiteConnection(connectionString))
             {
-                foreach (DataRow row in dataTable.Rows)
+                connection.Open();
+
+                using (var transaction = connection.BeginTransaction())
+                using (var command = connection.CreateCommand())
                 {
-                    string commandText = "";
-                    command.Parameters.Clear();
-
-                    
-                    if (row.RowState == DataRowState.Added)
+                    try
                     {
-                        // Операция INSERT
-                        commandText = "INSERT INTO Contracts (Название, ИНН, Номер, Дата_заключения, Дата_окончания, Предмет_договора, Сумма, Этап, Сроки_по_этапам) VALUES (@Название, @ИНН, @Номер, @Дата_заключения, @Дата_окончания, @Предмет_договора, @Сумма, @Этап, @Сроки_по_этапам)";
-                    }
-                    else if (row.RowState == DataRowState.Modified)
-                    {
-                        // Операция UPDATE
-                        commandText = "UPDATE Contracts SET Название = @Название, ИНН = @ИНН, Номер = @Номер, Дата_заключения = @Дата_заключения, Дата_окончания = @Дата_окончания, Предмет_договора = @Предмет_договора, Сумма = @Сумма, Этап = @Этап, Сроки_по_этапам = @Сроки_по_этапам WHERE id = @id";
-                        command.Parameters.AddWithValue("@id", row["id"]);
-                    }
-                    else if (row.RowState == DataRowState.Deleted)
-                    {
-                        // Операция DELETE
-                        DataRow originalRow = row.Table.Rows.Find(row["id", DataRowVersion.Original]);
-                        if (originalRow != null)
+                        foreach (DataRow row in dataTable.Rows)
                         {
-                            commandText = "DELETE FROM Contracts WHERE id = @id";
-                            command.Parameters.AddWithValue("@id", originalRow["id"]);
+                            if (row.RowState == DataRowState.Deleted)
+                            {
+                                // Delete logic
+                                var originalId = row["id", DataRowVersion.Original];
+                                if (originalId != DBNull.Value)
+                                {
+                                    command.CommandText = "DELETE FROM Contracts WHERE id = @id";
+                                    command.Parameters.Clear();
+                                    command.Parameters.AddWithValue("@id", originalId);
+                                    command.ExecuteNonQuery();
+                                }
+                            }
+                            else if (row.RowState == DataRowState.Added || row.RowState == DataRowState.Modified)
+                            {
+                                // Insert or Update logic
+                                command.Parameters.Clear();
+                                command.Parameters.AddWithValue("@id", row["id"]);
+                                command.Parameters.AddWithValue("@Название", row["Название"]);
+                                command.Parameters.AddWithValue("@ИНН", row["ИНН"]);
+                                command.Parameters.AddWithValue("@Номер", row["Номер"]);
+                                command.Parameters.AddWithValue("@Дата_заключения", row["Дата_заключения"]);
+                                command.Parameters.AddWithValue("@Дата_окончания", row["Дата_окончания"]);
+                                command.Parameters.AddWithValue("@Предмет_договора", row["Предмет_договора"]);
+                                command.Parameters.AddWithValue("@Сумма", row["Сумма"]);
+                                command.Parameters.AddWithValue("@Этап", row["Этап"]);
+                                command.Parameters.AddWithValue("@Сроки_по_этапам", row["Сроки_по_этапам"]);
+
+                                if (row.RowState == DataRowState.Added)
+                                {
+                                    // INSERT logic
+                                    command.CommandText = "INSERT INTO Contracts  (Название, ИНН, Номер, Дата_заключения, Дата_окончания, Предмет_договора, Сумма, Этап, Сроки_по_этапам) VALUES (@Название, @ИНН, @Номер, @Дата_заключения, @Дата_окончания, @Предмет_договора, @Сумма, @Этап, @Сроки_по_этапам)";
+                                }
+                                else if (row.RowState == DataRowState.Modified)
+                                {
+                                    // UPDATE logic
+                                    command.CommandText = "UPDATE Contracts SET Название = @Название, ИНН = @ИНН, Номер = @Номер, Дата_заключения = @Дата_заключения, Дата_окончания = @Дата_окончания, Предмет_договора = @Предмет_договора, Сумма = @Сумма, Этап = @Этап, Сроки_по_этапам = @Сроки_по_этапам WHERE id = @id";
+                                }
+
+                                command.ExecuteNonQuery();
+                            }
                         }
+
+                        transaction.Commit();
                     }
-
-                    if (!string.IsNullOrEmpty(commandText))
+                    catch (Exception ex)
                     {
-                        command.CommandText = commandText;
-                        command.Parameters.AddWithValue("@Название", row["Название"]);
-                        command.Parameters.AddWithValue("@ИНН", row["ИНН"]);
-                        command.Parameters.AddWithValue("@Номер", row["Номер"]);
-                        command.Parameters.AddWithValue("@Дата_заключения", row["Дата_заключения"]);
-                        command.Parameters.AddWithValue("@Дата_окончания", row["Дата_окончания"]);
-                        command.Parameters.AddWithValue("@Предмет_договора", row["Предмет_договора"]);
-                        command.Parameters.AddWithValue("@Сумма", row["Сумма"]);
-                        command.Parameters.AddWithValue("@Этап", row["Этап"]);
-                        command.Parameters.AddWithValue("@Сроки_по_этапам", row["Сроки_по_этапам"]);
-
-                        command.ExecuteNonQuery();
+                        transaction.Rollback(); // Rollback on error
+                        MessageBox.Show("Возникла ошибка: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
-
-                transaction.Commit();
             }
         }
 
@@ -285,7 +297,6 @@ namespace Energopul
                 MessageBox.Show("Ошибка: не удалось получить данные для сохранения", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
 
         private void ComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
