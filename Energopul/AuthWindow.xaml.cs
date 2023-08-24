@@ -16,6 +16,10 @@ namespace Energopul
 {
     public partial class AuthWindow : Window
     {
+
+        public string ReceivedUser { get; set; }
+        public string ReceivedPass { get; set; }
+
         public AuthWindow()
         {
             InitializeComponent();
@@ -35,6 +39,13 @@ namespace Energopul
             {
                 MessageBox.Show("Неверные данные пользователя. Пожалуйста, повторите попытку.", "Ошибка аутентификации", MessageBoxButton.OK);
             }
+        }
+
+        private void DropBtn_Click(object sender, RoutedEventArgs e)
+        {
+            AuthDropWindow authDropWindow = new AuthDropWindow();
+            authDropWindow.Show();
+            Close();
         }
     }
 }  

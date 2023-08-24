@@ -25,7 +25,7 @@
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
             <TextBlock HorizontalAlignment="Stretch" Margin="0,0,0,5" TextAlignment="Center"  Text="Документ" VerticalAlignment="Stretch"/>
-            <ComboBox x:Name="Period" Grid.Row="1" Margin="0,5,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" SelectionChanged="ComboBox_SelectionChanged" />
+            <ComboBox x:Name="Period" Grid.Row="1" Margin="0,5,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  SelectionChanged="ComboBox_SelectionChanged" />
         </Grid>
         <Button Grid.Row="0" Grid.Column="2" Content="Поиск" Margin="10"/>
         <Grid Grid.Row="0" Grid.Column="3" VerticalAlignment="Stretch" Margin="10">

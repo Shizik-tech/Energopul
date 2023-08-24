@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Energopul"
         mc:Ignorable="d"
-        Title="Авторизация Энергопул" Height="350" Width="300" MinHeight="350" MinWidth="300">
+        Title="Авторизация Энергопул" Height="450" Width="300" MinHeight="350" MinWidth="300">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
@@ -17,6 +18,6 @@
         <TextBox Grid.Row="1" x:Name="TxtUsername" HorizontalAlignment="Stretch" Margin="40, 10" Height="35" TextWrapping="Wrap" VerticalAlignment="Center"/>
         <PasswordBox Grid.Row="2" x:Name="TxtPassword" HorizontalAlignment="Stretch" Margin="40, 10" Height="35" VerticalAlignment="Center"/>
         <Button MaxHeight="70" MaxWidth="150" Name="AuthBtn" Grid.Row="3" Content="Вход" HorizontalAlignment="Stretch" Margin="40, 10" Click="AuthBtn_Click"/>
-
+        <Button MaxHeight="70" MaxWidth="150" Name="DropBtn" Grid.Row="4" Content="Сброс данных" HorizontalAlignment="Stretch" Margin="40, 10" Click="DropBtn_Click"/>
     </Grid>
 </Window>

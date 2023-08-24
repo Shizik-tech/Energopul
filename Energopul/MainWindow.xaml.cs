@@ -17,6 +17,7 @@ namespace Energopul
         public MainWindow()
         {
             InitializeComponent();
+            InitializeComboBox();
             LoadDataToDataGrid();
         }
 
@@ -40,6 +41,16 @@ namespace Energopul
             }
         }
 
+        private void InitializeComboBox()
+        {
+            Period.Items.Add("Поквартально");
+            Period.Items.Add("Полугодично");
+            Period.Items.Add("Ежегодно");
+            Period.Items.Add("Двухгодично");
+            
+
+        }
+
         private void LoadDataToDataGrid()
         {
             const string query = "SELECT * FROM Contracts;";
@@ -51,7 +62,25 @@ namespace Energopul
 
         private void ExportDataTableToExcel(DataTable dataTable, string fileName)
         {
+            FileInfo fileInfo = new FileInfo(fileName);
+
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            if (fileInfo.Exists)
+            {
+                MessageBoxResult result = MessageBox.Show("Документ с таким названием уже существует. Перезаписать?", "Предупреждение", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.No)
+                {
+                    MessageBox.Show("Операция отменена.");
+                    return;
+                }
+                else
+                {
+                    fileInfo.Delete();
+                }
+            }
+
 
             using (ExcelPackage package = new ExcelPackage(new FileInfo(fileName)))
             {
@@ -72,7 +101,10 @@ namespace Energopul
 
                 package.Save();
             }
-        }
+
+            MessageBox.Show("Экспорт данных успешно выполнен", "Экспорт", MessageBoxButton.OK);
+        
+    }
 
         private void ExportDataTableToWord(DataTable dataTable, string fileName)
         {
@@ -117,6 +149,7 @@ namespace Energopul
                 }
 
                 body.Append(table);
+                MessageBox.Show("Экспорт данных успешно выполнен", "Экспорт", MessageBoxButton.OK);
             }
         }
 
@@ -163,18 +196,11 @@ namespace Energopul
 
                 cmd.CommandText = $@"
                     SELECT
-                        org.Name AS 'Название организации',
-                        org.INN AS 'ИНН организации',
-                        con.Con_date AS 'Номер договора',
-                        con.Start_date AS 'Дата заключения договора',
-                        con.Con_stage AS 'Этап договора',
-                        con.Sub_of_con AS 'Предмет договора',
-                        con.Con_sum AS 'Сумма договора',
-                        con.Con_end AS 'Дата окончания договора'
+                        *
                     FROM
-                        Contracts con
+                        Contracts 
                     WHERE
-                        con.date_of_con BETWEEN @start_date AND @end_date_rout";
+                        Дата заключения BETWEEN @start_date AND @end_date_rout";
 
                 cmd.Parameters.AddWithValue("@start_date", start_date);
                 cmd.Parameters.AddWithValue("@end_date_rout", end_date_rout);
@@ -262,9 +288,10 @@ namespace Energopul
             }
         }
 
+
         private void ComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-
+            ButtonShow_Click(sender, e);
         }
     }
 }
