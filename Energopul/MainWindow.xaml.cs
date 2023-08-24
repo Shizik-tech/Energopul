@@ -47,8 +47,6 @@ namespace Energopul
             Period.Items.Add("Полугодично");
             Period.Items.Add("Ежегодно");
             Period.Items.Add("Двухгодично");
-            
-
         }
 
         private void LoadDataToDataGrid()
@@ -200,7 +198,7 @@ namespace Energopul
                     FROM
                         Contracts 
                     WHERE
-                        Дата заключения BETWEEN @start_date AND @end_date_rout";
+                        Дата_заключения BETWEEN @start_date AND @end_date_rout";
 
                 cmd.Parameters.AddWithValue("@start_date", start_date);
                 cmd.Parameters.AddWithValue("@end_date_rout", end_date_rout);
@@ -233,12 +231,12 @@ namespace Energopul
                     if (row.RowState == DataRowState.Added)
                     {
                         // Операция INSERT
-                        commandText = "INSERT INTO Contracts (Название, ИНН, \"Номер договора\", \"Дата заключения\", \"Дата начала выполнения\", \"Предмет договора\", \"Сумма договора\", \"Этап договора\", \"Дата окончания выполнения\") VALUES (@Название, @ИНН, @Номер_договора, @Дата_заключения, @Дата_начала_выполнения, @Предмет_договора, @Сумма_договора, @Этап_договора, @Дата_окончания_выполнения)";
+                        commandText = "INSERT INTO Contracts (Название, ИНН, Номер, Дата_заключения, Дата_окончания, Предмет_договора, Сумма, Этап, Сроки_по_этапам) VALUES (@Название, @ИНН, @Номер, @Дата_заключения, @Дата_окончания, @Предмет_договора, @Сумма, @Этап, @Сроки_по_этапам)";
                     }
                     else if (row.RowState == DataRowState.Modified)
                     {
                         // Операция UPDATE
-                        commandText = "UPDATE Contracts SET Название = @Название, ИНН = @ИНН, \"Номер договора\" = @Номер_договора, \"Дата заключения\" = @Дата_заключения, \"Дата начала выполнения\" = @Дата_начала_выполнения, \"Предмет договора\" = @Предмет_договора, \"Сумма договора\" = @Сумма_договора, \"Этап договора\" = @Этап_договора, \"Дата окончания выполнения\" = @Дата_окончания_выполнения WHERE id = @id";
+                        commandText = "UPDATE Contracts SET Название = @Название, ИНН = @ИНН, Номер = @Номер, Дата_заключения = @Дата_заключения, Дата_окончания = @Дата_окончания, Предмет_договора = @Предмет_договора, Сумма = @Сумма, Этап = @Этап, Сроки_по_этапам = @Сроки_по_этапам WHERE id = @id";
                         command.Parameters.AddWithValue("@id", row["id"]);
                     }
                     else if (row.RowState == DataRowState.Deleted)
@@ -257,13 +255,13 @@ namespace Energopul
                         command.CommandText = commandText;
                         command.Parameters.AddWithValue("@Название", row["Название"]);
                         command.Parameters.AddWithValue("@ИНН", row["ИНН"]);
-                        command.Parameters.AddWithValue("@Номер_договора", row["Номер договора"]);
-                        command.Parameters.AddWithValue("@Дата_заключения", row["Дата заключения"]);
-                        command.Parameters.AddWithValue("@Дата_начала_выполнения", row["Дата начала выполнения"]);
-                        command.Parameters.AddWithValue("@Предмет_договора", row["Предмет договора"]);
-                        command.Parameters.AddWithValue("@Сумма_договора", row["Сумма договора"]);
-                        command.Parameters.AddWithValue("@Этап_договора", row["Этап договора"]);
-                        command.Parameters.AddWithValue("@Дата_окончания_выполнения", row["Дата окончания выполнения"]);
+                        command.Parameters.AddWithValue("@Номер", row["Номер"]);
+                        command.Parameters.AddWithValue("@Дата_заключения", row["Дата_заключения"]);
+                        command.Parameters.AddWithValue("@Дата_окончания", row["Дата_окончания"]);
+                        command.Parameters.AddWithValue("@Предмет_договора", row["Предмет_договора"]);
+                        command.Parameters.AddWithValue("@Сумма", row["Сумма"]);
+                        command.Parameters.AddWithValue("@Этап", row["Этап"]);
+                        command.Parameters.AddWithValue("@Сроки_по_этапам", row["Сроки_по_этапам"]);
 
                         command.ExecuteNonQuery();
                     }
