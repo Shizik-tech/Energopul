@@ -5,12 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Energopul"
         mc:Ignorable="d"
-        Title="Договора Энергопул" Height="450" Width="800" MinHeight="450" MinWidth="800">
+        Title="Договора Энергопул" Height="550" Width="800" MinHeight="450" MinWidth="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"></RowDefinition>
             <RowDefinition Height="4*"></RowDefinition>
             <RowDefinition Height="4*"></RowDefinition>
+            <RowDefinition Height="1*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition></ColumnDefinition>
@@ -26,7 +27,7 @@
             </Grid.RowDefinitions>
 
             <ComboBox x:Name="Period" Grid.Row="1" Margin="10,5,10,0"  SelectionChanged="ComboBox_SelectionChanged" />
-            <TextBox x:Name="Search" HorizontalAlignment="Center" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" Height="28"/>
+            <TextBox Grid.Row="0"  x:Name="Search" HorizontalAlignment="Center" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" Height="28"/>
         </Grid>
         <Button x:Name="SearchBtn" Grid.Row="0" Grid.Column="2" Content="Поиск" Margin="10" Click="SearchBtn_Click"/>
         <Grid Grid.Row="0" Grid.Column="3" VerticalAlignment="Stretch" Margin="10">
@@ -38,6 +39,6 @@
             <Button Click="ExportDataToWordButton_Click" Grid.Row="1" Content="Экспорт в Word" Margin="0,5,0,0" VerticalAlignment="Stretch"/>
         </Grid>
         <Button Click="SaveChangesButton_Click" Grid.Row="0" Grid.Column="0" Content="Внести изменения"  Margin="10"/>
-
+        <Button Grid.Row="3" Grid.Column="3" Content="Сброс фильтра" Name="ResetBtn" Click="ResetBtn_OnClick" Margin="10"></Button>
     </Grid>
 </Window>

@@ -17,7 +17,6 @@ namespace Energopul
 {
     public partial class AuthWindow : Window
     {
-
         public string ReceivedUser { get; set; }
         public string ReceivedPass { get; set; }
 
@@ -29,51 +28,52 @@ namespace Energopul
 
         private void AuthBtn_Click(object sender, RoutedEventArgs e)
         {
-            string filePath = "data.txt"; // Укажите путь к файлу
+            const string filePath = "data.txt"; // Укажите путь к файлу
 
             try
             {
                 if (File.Exists(filePath))
                 {
-                    string[] lines = File.ReadAllLines(filePath);
+                    var lines = File.ReadAllLines(filePath);
 
                     if (lines.Length >= 2)
                     {
-                        string User = lines[0];
-                        string Password = lines[1];
-                        if (TxtUsername.Text == User && TxtPassword.Password == Password)
+                        var user = lines[0];
+                        var password = lines[1];
+                        if (TxtUsername.Text == user && TxtPassword.Password == password)
                         {
-                            MainWindow mainWindow = new MainWindow();
+                            var mainWindow = new MainWindow();
                             mainWindow.Show();
                             Close();
                         }
                         else
-                            MessageBox.Show("Не верный логин или пароль");
-
+                            MessageBox.Show("Неверный логин или пароль", "Ошибка", 
+                                MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                     else
                     {
-                        MessageBox.Show("Нет данных о логине или пароле.");
+                        MessageBox.Show("Нет данных о логине или пароле", "Ошибка", 
+                            MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
                 else
                 {
-                    MessageBox.Show("Нет файла с данными.");
+                    MessageBox.Show("Нет файла с данными", "Ошибка", 
+                        MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (IOException ex)
             {
-                MessageBox.Show("Ошибка при загруске файла: " + ex.Message);
+                MessageBox.Show("Произошла ошибка при загрузке файла: " + ex.Message, "Ошибка", 
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
-            
         }
 
         private void DropBtn_Click(object sender, RoutedEventArgs e)
         {
-            AuthDropWindow authDropWindow = new AuthDropWindow();
+            var authDropWindow = new AuthDropWindow();
             authDropWindow.Show();
             Close();
         }
     }
-}  
+}

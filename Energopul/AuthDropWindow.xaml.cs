@@ -13,9 +13,6 @@ using System.Windows.Shapes;
 
 namespace Energopul
 {
-    /// <summary>
-    /// Логика взаимодействия для AuthDropWindow.xaml
-    /// </summary>
     public partial class AuthDropWindow : Window
     {
         public AuthDropWindow()
@@ -27,30 +24,31 @@ namespace Energopul
         {
             if (Spec.Text == "Энерго")
             {
-                AuthWindow authWindow = new AuthWindow();
-                string dataToSave = TxtUsername.Text + Environment.NewLine + TxtPassword.Password;
-                string filePath = "data.txt"; // Укажите путь к файлу
+                var authWindow = new AuthWindow();
+                var dataToSave = TxtUsername.Text + Environment.NewLine + TxtPassword.Password;
+                const string filePath = "data.txt"; // Укажите путь к файлу
 
                 try
                 {
                     File.WriteAllText(filePath, dataToSave);
-                    MessageBox.Show("Успешно.");
+                    MessageBox.Show("Успешно сброшены данные");
                 }
                 catch (IOException ex)
                 {
-                    MessageBox.Show("Error saving data: " + ex.Message);
+                    MessageBox.Show("Произошла ошибка при сохранении данных: " + ex.Message);
                 }
                 
                 authWindow.Show();
                 Close();
             }
             else
-                MessageBox.Show("Не верное спец слово");
+                MessageBox.Show("Введено неверное спецслово", 
+                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         private void Back_Click(object sender, RoutedEventArgs e)
         {
-            AuthWindow authWindow = new AuthWindow();
+            var authWindow = new AuthWindow();
             authWindow.Show();
             Close();
         }

@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="bin\Debug\netcoreapp3.1\data.txt" />
     <None Include="bin\Debug\netcoreapp3.1\energopul.db" />
   </ItemGroup>
 
