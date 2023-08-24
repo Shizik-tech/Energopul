@@ -47,6 +47,7 @@ namespace Energopul
             Period.Items.Add("Полугодично");
             Period.Items.Add("Ежегодно");
             Period.Items.Add("Двухгодично");
+            Period.Items.Add("За всё время");
         }
 
         private void LoadDataToDataGrid()
@@ -187,6 +188,9 @@ namespace Energopul
                     case 4:
                         start_date = DateTime.Now.AddYears(-2).ToString("yyyy-MM-dd");
                         break;
+                    case 5:
+                        start_date = "0000-00-00";
+                        break;
                     default:
                         MessageBox.Show("Invalid period");
                         return;
@@ -301,6 +305,34 @@ namespace Energopul
         private void ComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             ButtonShow_Click(sender, e);
+        }
+
+        private void SearchBtn_Click(object sender, RoutedEventArgs e)
+        {
+            string searchValue = Search.Text; // Получаем значение поиска из текстового поля (замените "SearchTextBox" на фактический элемент управления)
+
+            if (string.IsNullOrWhiteSpace(searchValue))
+            {
+                MessageBox.Show("Введите значение для поиска", "Поиск", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            string query = "SELECT * FROM Contracts WHERE Номер LIKE @searchValue";
+
+            DataTable dataTable = new DataTable();
+            using (SQLiteConnection connection = new SQLiteConnection(GetConnectionString()))
+            using (SQLiteCommand command = new SQLiteCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@searchValue", "%" + searchValue + "%"); // Используем подстановку для частичного соответствия
+
+                connection.Open();
+                using (SQLiteDataAdapter adapter = new SQLiteDataAdapter(command))
+                {
+                    adapter.Fill(dataTable);
+                }
+            }
+
+            Table.ItemsSource = dataTable.DefaultView; // Обновляем DataGrid с результатами поиска
         }
     }
 }

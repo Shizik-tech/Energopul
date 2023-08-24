@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,21 +25,48 @@ namespace Energopul
         {
             InitializeComponent();
         }
+
+
         private void AuthBtn_Click(object sender, RoutedEventArgs e)
         {
-            string username = TxtUsername.Text;
-            string password = TxtPassword.Password;
+            string filePath = "data.txt"; // Укажите путь к файлу
 
-            if (username == "" && password == "")
+            try
             {
-                MainWindow mainWindow = new MainWindow();
-                mainWindow.Show();
-                Close();
+                if (File.Exists(filePath))
+                {
+                    string[] lines = File.ReadAllLines(filePath);
+
+                    if (lines.Length >= 2)
+                    {
+                        string User = lines[0];
+                        string Password = lines[1];
+                        if (TxtUsername.Text == User && TxtPassword.Password == Password)
+                        {
+                            MainWindow mainWindow = new MainWindow();
+                            mainWindow.Show();
+                            Close();
+                        }
+                        else
+                            MessageBox.Show("Не верный логин или пароль");
+
+                    }
+                    else
+                    {
+                        MessageBox.Show("Нет данных о логине или пароле.");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Нет файла с данными.");
+                }
             }
-            else
+            catch (IOException ex)
             {
-                MessageBox.Show("Неверные данные пользователя. Пожалуйста, повторите попытку.", "Ошибка аутентификации", MessageBoxButton.OK);
+                MessageBox.Show("Ошибка при загруске файла: " + ex.Message);
             }
+
+            
         }
 
         private void DropBtn_Click(object sender, RoutedEventArgs e)

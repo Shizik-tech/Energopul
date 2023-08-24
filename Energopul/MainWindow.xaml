@@ -24,10 +24,11 @@
                 <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
-            <TextBlock HorizontalAlignment="Stretch" Margin="0,0,0,5" TextAlignment="Center"  Text="Документ" VerticalAlignment="Stretch"/>
-            <ComboBox x:Name="Period" Grid.Row="1" Margin="0,5,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  SelectionChanged="ComboBox_SelectionChanged" />
+
+            <ComboBox x:Name="Period" Grid.Row="1" Margin="10,5,10,0"  SelectionChanged="ComboBox_SelectionChanged" />
+            <TextBox x:Name="Search" HorizontalAlignment="Center" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" Height="28"/>
         </Grid>
-        <Button Grid.Row="0" Grid.Column="2" Content="Поиск" Margin="10"/>
+        <Button x:Name="SearchBtn" Grid.Row="0" Grid.Column="2" Content="Поиск" Margin="10" Click="SearchBtn_Click"/>
         <Grid Grid.Row="0" Grid.Column="3" VerticalAlignment="Stretch" Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition></RowDefinition>

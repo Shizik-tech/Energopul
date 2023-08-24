@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,11 +27,20 @@ namespace Energopul
         {
             if (Spec.Text == "Энерго")
             {
-                string user = TxtUsername.Text;
-                string pass = TxtPassword.Password;
                 AuthWindow authWindow = new AuthWindow();
-                authWindow.ReceivedUser = user;
-                authWindow.ReceivedPass = pass;
+                string dataToSave = TxtUsername.Text + Environment.NewLine + TxtPassword.Password;
+                string filePath = "data.txt"; // Укажите путь к файлу
+
+                try
+                {
+                    File.WriteAllText(filePath, dataToSave);
+                    MessageBox.Show("Успешно.");
+                }
+                catch (IOException ex)
+                {
+                    MessageBox.Show("Error saving data: " + ex.Message);
+                }
+                
                 authWindow.Show();
                 Close();
             }

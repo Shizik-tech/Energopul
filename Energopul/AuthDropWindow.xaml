@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Energopul"
         mc:Ignorable="d"
-        Title="AuthDropWindow" Height="550" Width="300">
+        Title="Сброс" Height="550" Width="300">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>
@@ -15,11 +15,11 @@
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
-        <Label Content="Сброс данных" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0"/>
+        <Label Content="Введите спец слово новый логин и пароль" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0"/>
         <TextBox Grid.Row="1" x:Name="Spec" HorizontalAlignment="Stretch" Margin="40, 10" Height="35" TextWrapping="Wrap" VerticalAlignment="Center"/>
-        <TextBox Grid.Row="3" x:Name="TxtUsername" HorizontalAlignment="Stretch" Margin="40, 10" Height="35" TextWrapping="Wrap" VerticalAlignment="Center"/>
-        <PasswordBox Grid.Row="2" x:Name="TxtPassword" HorizontalAlignment="Stretch" Margin="40, 10" Height="35" VerticalAlignment="Center"/>
-        <Button MaxHeight="70" MaxWidth="150" Name="AuthDrop" Grid.Row="4" Content="Вход" HorizontalAlignment="Stretch" Margin="40, 10" Click="AuthDropBtn_Click"/>
+        <TextBox Grid.Row="2" x:Name="TxtUsername" HorizontalAlignment="Stretch" Margin="40, 10" Height="35" TextWrapping="Wrap" VerticalAlignment="Center"/>
+        <PasswordBox Grid.Row="3" x:Name="TxtPassword" HorizontalAlignment="Stretch" Margin="40, 10" Height="35" VerticalAlignment="Center"/>
+        <Button MaxHeight="70" MaxWidth="150" Name="AuthDrop" Grid.Row="4" Content="Сброс" HorizontalAlignment="Stretch" Margin="40, 10" Click="AuthDropBtn_Click"/>
         <Button MaxHeight="70" MaxWidth="150" Name="Back" Grid.Row="5" Content="Назад" HorizontalAlignment="Stretch" Margin="40, 10" Click="Back_Click"/>
 
     </Grid>
